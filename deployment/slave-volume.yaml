@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-mysql-pv02
+spec:
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /data/container_data/mysql_slave/pv1
+    server: 172.23.5.87
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-mysql-pv03
+spec:
+  capacity:
+    storage: 8Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    path: /data/container_data/mysql_slave/pv2
+    server: 172.23.5.87

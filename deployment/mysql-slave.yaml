@@ -1,0 +1,57 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: mysql-s-node
+spec:
+  serviceName: "mysql-s-service"
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: mysql-s-node
+    spec:
+      terminationGracePeriodSeconds: 10
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - mysql
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: mysql-slave
+        image: 172.23.5.1:8806/huangming/mysql-slave:5.7.23
+        ports:
+        - containerPort: 3306
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-root-pass
+                key: password
+          - name: MYSQL_REPLICATION_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-repl-pass
+                key: password
+          - name: MYSQL_REPLICATION_USER
+            value: "repl"
+          - name: MYSQL_MASTER_SERVICE_HOST
+            value: mysql-m-node-0.mysql-m-service.default.svc.cluster.local
+        volumeMounts:
+        - name: mysql-slave-vol
+          mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-slave-vol
+    spec:
+      accessModes: [ "ReadWriteMany" ]
+      resources:
+        requests:
+          storage: 8Gi
+

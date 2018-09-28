@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-mc-service
+  labels:
+    app: mysql-mc-service
+spec:
+  selector:
+    app: mysql-m-node
+  ports:
+  - name: mysql-m-port
+    protocol: "TCP"
+    port: 3306
+    targetPort: 3306
+    nodePort: 36601
+  type: NodePort
+  sessionAffinity: ClientIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-sc-service
+  labels:
+    app: mysql-sc-service
+spec:
+  selector:
+    app: mysql-s-node
+  ports:
+  - name: mysql-s-port
+    protocol: "TCP"
+    port: 3306
+    targetPort: 3306
+    nodePort: 36602
+  type: NodePort
+  sessionAffinity: ClientIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-m-service
+  labels:
+    app: mysql-m-service
+spec:
+  ports:
+  - name: mysql-port
+    port: 6379
+  clusterIP: None
+  selector:
+    app: mysql-m-node
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-s-service
+  labels:
+    app: mysql-s-service
+spec:
+  ports:
+  - name: mysql-port
+    port: 6379
+  clusterIP: None
+  selector:
+    app: mysql-s-node
+
